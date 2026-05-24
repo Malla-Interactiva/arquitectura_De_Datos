@@ -1,4 +1,4 @@
-﻿# Aplicación ETL — COMUNAS_NORM + FAMOSOS + LUGARES
+# Aplicación ETL — COMUNAS_NORM + FAMOSOS + LUGARES
 **Arquitectura y Almacenamiento de Datos — Evaluación 2 · 2026**
 Integrantes: Jostin Sáez · Gerardo Millán · Eduardo Díaz
 
@@ -68,24 +68,13 @@ python app.py
 # http://localhost:5000
 ```
 
----
+## Despliegue en Producción
 
-## Despliegue en Railway (Producción)
+La aplicación se encuentra desplegada y funcionando en la nube a través de Railway:
 
-### Paso 1: Subir a GitHub
-Sube este código a un repositorio de GitHub (puedes omitir las carpetas `venv/`, `__pycache__/` y la base de datos `comunas_norm.db`).
+🔗 **Link de la Aplicación:** [https://web-production-8c158.up.railway.app](https://web-production-8c158.up.railway.app)
 
-### Paso 2: Conectar con Railway
-1. Ve a [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub Repo**.
-2. Selecciona tu repositorio. Railway detectará la app gracias al archivo `Procfile` y comenzará el despliegue automático.
-
-### Paso 3: Configurar Persistencia de Datos (¡Obligatorio!)
-Railway usa un sistema de archivos efímero por defecto. Si no realizas este paso, la base de datos SQLite se borrará cada vez que reinicies o actualices el servidor.
-1. Haz clic sobre tu servicio en Railway, ve a la pestaña **Settings** y busca la sección **Volumes**.
-2. Haz clic en **Add Volume** y asígnale el *Mount Path*: `/data`
-3. Ve a la pestaña **Variables** y crea la siguiente variable de entorno:
-   - `DATABASE_PATH` = `/data/comunas_norm.db`
-4. El servidor se reiniciará automáticamente y tu base de datos ahora será persistente en la nube.
+*Nota: La base de datos en producción utiliza un **Volumen Persistente** (`/data/comunas_norm.db`) para garantizar que la información no se borre entre reinicios del servidor.*
 
 ---
 
