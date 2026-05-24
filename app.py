@@ -31,9 +31,9 @@ from flask import Flask, render_template, request, jsonify, send_file, g
 
 app = Flask(__name__)
 
-# La BD se guarda en la misma carpeta del proyecto
-DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'comunas_norm.db')
-PORT     = 5000
+# La BD se guarda en la ruta indicada por DATABASE_PATH, o en la misma carpeta por defecto
+DATABASE = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'comunas_norm.db'))
+PORT     = int(os.environ.get('PORT', 5000))
 
 
 # ===========================================================================
@@ -159,6 +159,9 @@ def init_db():
     db.commit()
     db.close()
     print(f"[DB] Base de datos lista en: {DATABASE}")
+
+# Inicializar la base de datos automáticamente (necesario para Gunicorn)
+init_db()
 
 
 # ===========================================================================
@@ -1708,8 +1711,6 @@ def api_lugares_limpiar():
 # ===========================================================================
 
 if __name__ == '__main__':
-    init_db()
-
     # Abrir el navegador automaticamente despues de 1 segundo
     Timer(1.0, lambda: webbrowser.open(f'http://localhost:{PORT}')).start()
 
