@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lugares — COMUNAS_NORM</title>
+<style>
+/* === RESET Y VARIABLES GLOBALES === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f4f6fa; --surface: #ffffff; --border: #d8dce8; --border-light: #eaecf3;
+  --text: #1a1d2b; --text-muted: #6b7080;
+  --accent: #2d5be3; --accent-light: #e8edfd;
+  --success: #1a8a5a; --success-light: #e6f7ef;
+  --warn: #b45309; --warn-light: #fef3e2;
+  --danger: #c0392b; --danger-light: #fdecea;
+  --radius: 10px; --radius-sm: 6px;
+  --shadow: 0 1px 4px rgba(0,0,0,.07);
+}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+/* === NAVEGACIÓN === */
+nav { background: #1a1d2b; display: flex; align-items: center; padding: 0 24px; height: 52px; gap: 8px; }
+nav a { color: rgba(255,255,255,.6); text-decoration: none; padding: 6px 14px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; transition: all .15s; }
+nav a:hover { color: #fff; background: rgba(255,255,255,.1); }
+nav a.active { color: #fff; background: var(--accent); }
+nav .brand { color: #fff; font-weight: 700; font-size: 15px; margin-right: 16px; letter-spacing: -.3px; }
+
+/* === DISEÑO PRINCIPAL === */
+main { max-width: 1100px; margin: 28px auto; padding: 0 20px 60px; }
+
+/* === TARJETAS === */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; }
+.card-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border-light); font-weight: 600; font-size: 14px; background: #fafbfd; gap: 10px; }
+.card-head h2 { font-size: 14px; font-weight: 600; }
+.card-body { padding: 20px; }
+
+/* === ZONA DE DRAG & DROP === */
+#dropzone {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 36px 20px; text-align: center; cursor: pointer;
+  transition: border-color .2s, background .2s; background: #fafbfd;
+}
+#dropzone:hover, #dropzone.drag-over { border-color: var(--accent); background: var(--accent-light); }
+#dropzone .dz-icon { font-size: 38px; margin-bottom: 10px; display: block; }
+#dropzone p { color: var(--text-muted); font-size: 14px; }
+#dropzone strong { color: var(--accent); }
+#file-input { display: none; }
+#file-info {
+  display: none; margin-top: 12px; padding: 10px 14px;
+  background: var(--success-light); border: 1px solid #a3d9c0;
+  border-radius: var(--radius-sm); font-size: 13px; color: var(--success);
+}
+
+/* === ESTADÍSTICAS === */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat { background: #fafbfd; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 16px 18px; }
+.stat .lbl { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.stat .val { font-size: 24px; font-weight: 700; }
+.stat .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.stat.blue .val  { color: var(--accent); }
+.stat.green .val { color: var(--success); }
+.stat.warn .val  { color: var(--warn); }
+.stat.red .val   { color: var(--danger); }
+.stat.purple .val { color: #7c3aed; }
+
+/* === PESTAÑAS === */
+.tabs { display: flex; border-bottom: 2px solid var(--border-light); margin-bottom: 20px; }
+.tab { padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--text-muted); transition: all .15s; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* === BARRA DE HERRAMIENTAS === */
+.toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-wrap input { width: 100%; padding: 8px 12px 8px 36px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; background: #fff; color: var(--text); }
+.search-wrap input:focus { outline: none; border-color: var(--accent); }
+.search-wrap .ico { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 14px; pointer-events: none; }
+select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; background: #fff; color: var(--text); cursor: pointer; }
+select:focus { outline: none; border-color: var(--accent); }
+
+/* === TABLA === */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); max-height: 480px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { position: sticky; top: 0; background: #f0f3fa; padding: 10px 13px; text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+tbody tr:hover { background: var(--accent-light); }
+tbody tr:nth-child(even) { background: #fafbfd; }
+tbody tr:nth-child(even):hover { background: var(--accent-light); }
+tbody td { padding: 8px 13px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.empty-row td { text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px; }
+
+/* === BADGES === */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.b-ok   { background: var(--success-light); color: var(--success); }
+.b-mod  { background: var(--accent-light);  color: var(--accent);  }
+.b-dup  { background: var(--danger-light);  color: var(--danger);  }
+
+/* === BOTONES === */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: 1px solid; transition: background .15s; }
+.btn-primary  { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: #1e44c0; }
+.btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-ghost:hover { background: var(--bg); }
+.btn-danger { background: var(--surface); color: var(--danger); border-color: var(--danger); }
+.btn-danger:hover { background: var(--danger-light); }
+
+/* === BOTÓN PRINCIPAL DE PROCESAR === */
+#btn-run {
+  width: 100%; padding: 13px; background: var(--accent); color: #fff;
+  border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: background .2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+#btn-run:hover { background: #1e44c0; }
+#btn-run:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+
+/* === FILA DE DESCARGAS === */
+.dl-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* === LOG ESTILO TERMINAL === */
+#log-box {
+  background: #1a1d2b; color: #a8d8a8;
+  font-family: 'Courier New', monospace; font-size: 12px;
+  padding: 14px 16px; border-radius: var(--radius-sm);
+  max-height: 240px; overflow-y: auto; line-height: 1.7; white-space: pre-wrap;
+}
+
+/* === CONTADOR EN PESTAÑAS === */
+.count-badge { font-size: 12px; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+
+/* === RECARGA AUTOMÁTICA === */
+.refresh-row { display: flex; align-items: center; gap: 10px; }
+.auto-tag { font-size: 12px; color: var(--success); font-weight: 500; }
+
+/* === COORDENADAS === */
+.coord { font-family: 'Courier New', monospace; font-size: 12px; color: var(--text-muted); }
+
+/* === SPINNER === */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* === ALERTA DE ERROR === */
+#error-box {
+  background: var(--danger-light); border: 1px solid #f5c2c2;
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  color: var(--danger); font-size: 13px; margin-top: 12px;
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ====================================================================== -->
+<!-- BARRA DE NAVEGACIÓN                                                    -->
+<!-- ====================================================================== -->
+<nav>
+  <span class="brand">🗂️ COMUNAS_NORM</span>
+  <a href="/">⚙️ Normalizar</a>
+  <a href="/base-datos">🗄️ Base de Datos</a>
+  <a href="/famosos">⭐ Famosos</a>
+  <a href="/lugares" class="active">📍 Lugares</a>
+</nav>
+
+<main>
+
+  <!-- ================================================================== -->
+  <!-- PASO 1: CARGA DE ARCHIVO (Drag & Drop)                             -->
+  <!-- ================================================================== -->
+  <div class="card">
+    <div class="card-head">
+      <h2>📁 Cargar archivo de lugares</h2>
+    </div>
+    <div class="card-body">
+      <!-- Zona de arrastrar y soltar -->
+      <div id="dropzone" onclick="document.getElementById('file-input').click()">
+        <span class="dz-icon">📍</span>
+        <p>Arrastra tu archivo <strong>.txt</strong> o <strong>.csv</strong> aquí o <strong>haz clic para seleccionar</strong></p>
+        <p style="margin-top:6px;font-size:12px;">Un lugar por línea · Compatible con .txt y .csv</p>
+      </div>
+      <!-- Input oculto para selección manual -->
+      <input type="file" id="file-input" accept=".txt,.csv">
+      <!-- Mensaje de confirmación del archivo cargado -->
+      <div id="file-info"></div>
+      <!-- Mensaje de error -->
+      <div id="error-box" class="hidden"></div>
+    </div>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- PASO 2: BOTÓN DE PROCESAR                                          -->
+  <!-- ================================================================== -->
+  <button id="btn-run" disabled onclick="procesar()">
+    <span id="btn-icon">▶</span>
+    <span id="btn-text">Procesar datos</span>
+  </button>
+
+  <!-- ================================================================== -->
+  <!-- RESULTADOS                                                         -->
+  <!-- ================================================================== -->
+  <div id="results" style="margin-top:24px;">
+
+    <!-- ────────────────────────────────────────────────────────────────── -->
+    <!-- TARJETA DE ESTADÍSTICAS                                          -->
+    <!-- ────────────────────────────────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-head">
+        <h2>📊 Resumen del proceso</h2>
+        <div class="refresh-row">
+          <span class="auto-tag" id="auto-label">● En vivo</span>
+          <button class="btn btn-ghost" onclick="cargarStats()" style="font-size:12px">🔄 Actualizar</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- Grilla de 5 estadísticas -->
+        <div class="stats-grid">
+          <div class="stat blue">
+            <div class="lbl">Total lugares únicos</div>
+            <div class="val" id="st-total">—</div>
+            <div class="sub">tabla LUGARES</div>
+          </div>
+          <div class="stat red">
+            <div class="lbl">Duplicados eliminados</div>
+            <div class="val" id="st-dups">—</div>
+            <div class="sub">registros omitidos</div>
+          </div>
+          <div class="stat green">
+            <div class="lbl">Países únicos</div>
+            <div class="val" id="st-paises">—</div>
+            <div class="sub">distintos detectados</div>
+          </div>
+          <div class="stat warn">
+            <div class="lbl">Georeferencias</div>
+            <div class="val" id="st-georef">—</div>
+            <div class="sub">coordenadas GPS</div>
+          </div>
+          <div class="stat purple">
+            <div class="lbl">Direcciones</div>
+            <div class="val" id="st-dir">—</div>
+            <div class="sub">direcciones completas</div>
+          </div>
+        </div>
+
+        <!-- Botones de descarga y acción -->
+        <div class="dl-row">
+          <button class="btn btn-primary" onclick="descargar('csv')" style="font-size:12px">💾 Descargar CSV</button>
+          <button class="btn btn-ghost"   onclick="descargar('sql')" style="font-size:12px">🗄️ Descargar SQL</button>
+          <button class="btn btn-ghost"   onclick="descargar('log')" style="font-size:12px">📋 Descargar LOG</button>
+          <button class="btn btn-danger"  onclick="limpiarBD()"      style="font-size:12px">🗑️ Limpiar BD</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────────────────────────────── -->
+    <!-- EXPLORADOR CON PESTAÑAS                                          -->
+    <!-- ────────────────────────────────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-head">
+        <h2>🔍 Explorador de Tablas</h2>
+      </div>
+      <div class="card-body">
+
+        <!-- Pestañas de navegación -->
+        <div class="tabs">
+          <div class="tab active" onclick="cambiarTab('lugares', this)">
+            📍 Lugares <span class="count-badge" id="cnt-lugares">0</span>
+          </div>
+          <div class="tab" onclick="cambiarTab('georef', this)">
+            🌍 Georeferencias <span class="count-badge" id="cnt-georef">0</span>
+          </div>
+          <div class="tab" onclick="cambiarTab('direcciones', this)">
+            🏠 Direcciones <span class="count-badge" id="cnt-direcciones">0</span>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PESTAÑA 1: LUGARES                                           -->
+        <!-- ============================================================ -->
+        <div class="tab-panel active" id="panel-lugares">
+          <!-- Barra de búsqueda y filtros -->
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span class="ico">🔎</span>
+              <input type="text" id="q-lugares" placeholder="Buscar lugar por nombre…" oninput="filtrarLocal()">
+            </div>
+            <select id="filtro-pais" onchange="cargarLista()">
+              <option value="">Todos los países</option>
+            </select>
+            <select id="limit-lugares" onchange="cargarLista()">
+              <option value="100">100 registros</option>
+              <option value="250">250 registros</option>
+              <option value="500" selected>500 registros</option>
+              <option value="9999">Todos</option>
+            </select>
+          </div>
+          <!-- Tabla de lugares -->
+          <div class="tbl-wrap">
+            <table id="tbl-lugares">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>País</th>
+                  <th>Coordenadas (lat, lon)</th>
+                </tr>
+              </thead>
+              <tbody id="body-lugares">
+                <tr class="empty-row"><td colspan="4">Cargando datos…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PESTAÑA 2: GEOREFERENCIAS                                    -->
+        <!-- ============================================================ -->
+        <div class="tab-panel" id="panel-georef">
+          <!-- Barra de búsqueda -->
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span class="ico">🔎</span>
+              <input type="text" id="q-georef" placeholder="Buscar georeferencia…" oninput="filtrarLocal()">
+            </div>
+            <select id="filtro-pais-georef" onchange="cargarLista()">
+              <option value="">Todos los países</option>
+            </select>
+          </div>
+          <!-- Tabla de georeferencias -->
+          <div class="tbl-wrap">
+            <table id="tbl-georef">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>id_lugar</th>
+                  <th>Nombre Lugar</th>
+                  <th>Latitud</th>
+                  <th>Longitud</th>
+                </tr>
+              </thead>
+              <tbody id="body-georef">
+                <tr class="empty-row"><td colspan="5">Cargando datos…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PESTAÑA 3: DIRECCIONES                                       -->
+        <!-- ============================================================ -->
+        <div class="tab-panel" id="panel-direcciones">
+          <!-- Barra de búsqueda -->
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span class="ico">🔎</span>
+              <input type="text" id="q-direcciones" placeholder="Buscar dirección…" oninput="filtrarLocal()">
+            </div>
+            <select id="filtro-pais-dir" onchange="cargarLista()">
+              <option value="">Todos los países</option>
+            </select>
+          </div>
+          <!-- Tabla de direcciones -->
+          <div class="tbl-wrap">
+            <table id="tbl-direcciones">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>id_lugar</th>
+                  <th>Nombre Lugar</th>
+                  <th>Calle</th>
+                  <th>Número</th>
+                  <th>Ciudad / Estado</th>
+                  <th>País</th>
+                </tr>
+              </thead>
+              <tbody id="body-direcciones">
+                <tr class="empty-row"><td colspan="7">Cargando datos…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────────────────────────────── -->
+    <!-- LOG DE PROCESO (estilo terminal)                                  -->
+    <!-- ────────────────────────────────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-head">
+        <h2>📝 Log del proceso</h2>
+      </div>
+      <div class="card-body" style="padding:12px">
+        <div id="log-box">Esperando procesamiento…</div>
+      </div>
+    </div>
+
+  </div><!-- /results -->
+
+</main>
+
+<script>
+// =============================================================================
+// lugares.html — Lógica JavaScript del módulo de Lugares ETL
+// =============================================================================
+// Responsabilidades:
+//   1. Gestionar la carga de archivos (drag & drop + clic)
+//   2. Enviar el archivo al backend vía POST /api/lugares/procesar
+//   3. Renderizar resultados en 3 pestañas: Lugares, Georeferencias, Direcciones
+//   4. Auto-refrescar datos desde la BD cada 15 segundos
+//   5. Permitir descarga de CSV, SQL y LOG
+// =============================================================================
+
+// --- Variables globales ---
+let sesionActual = null;           // ID de la sesión actual procesada
+let archivoSeleccionado = null;    // Referencia al archivo seleccionado
+let paisesDisponibles = [];        // Lista de países para los filtros
+
+// Datos locales cargados (para filtrado local sin ir al servidor)
+let datosLugares = [];
+let datosGeoref = [];
+let datosDirecciones = [];
+
+// =============================================================================
+// DRAG & DROP — Gestión de archivos
+// =============================================================================
+
+const dz = document.getElementById('dropzone');
+
+// Al arrastrar sobre la zona: resaltar
+dz.addEventListener('dragover', e => {
+  e.preventDefault();
+  dz.classList.add('drag-over');
+});
+
+// Al salir de la zona: quitar resaltado
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+
+// Al soltar el archivo
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  dz.classList.remove('drag-over');
+  const archivos = e.dataTransfer.files;
+  if (archivos.length > 0) registrarArchivo(archivos[0]);
+});
+
+// Al seleccionar mediante el input oculto
+document.getElementById('file-input').addEventListener('change', e => {
+  if (e.target.files.length > 0) registrarArchivo(e.target.files[0]);
+});
+
+/**
+ * Registra el archivo seleccionado, muestra confirmación y habilita el botón.
+ * @param {File} file - Archivo seleccionado por el usuario
+ */
+function registrarArchivo(file) {
+  // Validar extensión del archivo
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext !== 'txt' && ext !== 'csv') {
+    mostrarError('Solo se permiten archivos .txt o .csv');
+    return;
+  }
+
+  archivoSeleccionado = file;
+
+  // Mostrar info del archivo
+  const info = document.getElementById('file-info');
+  const tamano = (file.size / 1024).toFixed(1);
+  info.innerHTML = `✅ <strong>${escHTML(file.name)}</strong> (${tamano} KB) listo para procesar`;
+  info.style.display = 'block';
+
+  // Ocultar errores previos
+  document.getElementById('error-box').classList.add('hidden');
+
+  // Habilitar botón de procesar
+  document.getElementById('btn-run').disabled = false;
+}
+
+// =============================================================================
+// PROCESAR — Enviar archivo al backend
+// =============================================================================
+
+/**
+ * Envía el archivo al endpoint POST /api/lugares/procesar
+ * y renderiza todos los resultados en las pestañas.
+ */
+async function procesar() {
+  if (!archivoSeleccionado) return;
+
+  // Deshabilitar botón y mostrar spinner
+  const btn = document.getElementById('btn-run');
+  const btnIcon = document.getElementById('btn-icon');
+  const btnText = document.getElementById('btn-text');
+  btn.disabled = true;
+  btnIcon.innerHTML = '<span class="spinner"></span>';
+  btnText.textContent = 'Procesando…';
+
+  // Ocultar errores previos
+  document.getElementById('error-box').classList.add('hidden');
+
+  try {
+    // Preparar FormData con el archivo
+    const fd = new FormData();
+    fd.append('archivo', archivoSeleccionado);
+
+    // Enviar al servidor
+    const resp = await fetch('/api/lugares/procesar', { method: 'POST', body: fd });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: 'Error del servidor' }));
+      throw new Error(err.error || `Error HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+
+    // Guardar la sesión para descargas
+    sesionActual = data.sesion_id;
+
+    // Guardar países disponibles y llenar los selectores
+    paisesDisponibles = data.paises || [];
+    llenarSelectoresPaises();
+
+    // Actualizar estadísticas
+    actualizarStats(data.stats);
+
+    // Guardar datos locales para filtrado
+    datosLugares = data.preview_lugares || [];
+    datosGeoref = data.preview_georef || [];
+    datosDirecciones = data.preview_direcciones || [];
+
+    // Renderizar las 3 tablas
+    renderizarLugares(datosLugares);
+    renderizarGeoref(datosGeoref);
+    renderizarDirecciones(datosDirecciones);
+
+    // Mostrar log del proceso
+    document.getElementById('log-box').textContent = data.log || 'Sin información de log.';
+
+    // Mostrar la sección de resultados
+    document.getElementById('results').classList.remove('hidden');
+
+  } catch (err) {
+    mostrarError(err.message);
+  } finally {
+    // Restaurar botón
+    btnIcon.textContent = '▶';
+    btnText.textContent = 'Procesar datos';
+    btn.disabled = false;
+  }
+}
+
+// =============================================================================
+// ESTADÍSTICAS
+// =============================================================================
+
+/**
+ * Actualiza los valores de las tarjetas de estadísticas.
+ * @param {Object} stats - Objeto con las estadísticas
+ */
+function actualizarStats(stats) {
+  if (!stats) return;
+  document.getElementById('st-total').textContent   = (stats.total_lugares || 0).toLocaleString();
+  document.getElementById('st-dups').textContent     = (stats.duplicados_eliminados || 0).toLocaleString();
+  document.getElementById('st-paises').textContent   = (stats.paises_unicos || 0).toLocaleString();
+  document.getElementById('st-georef').textContent   = (stats.total_georef || 0).toLocaleString();
+  document.getElementById('st-dir').textContent      = (stats.total_direcciones || 0).toLocaleString();
+}
+
+/**
+ * Carga estadísticas desde el servidor (GET /api/lugares/stats).
+ */
+async function cargarStats() {
+  try {
+    const resp = await fetch('/api/lugares/stats');
+    if (!resp.ok) return;
+    const data = await resp.json();
+    actualizarStats(data);
+  } catch {
+    // Silenciar errores de red en auto-refresh
+  }
+}
+
+// =============================================================================
+// CARGAR LISTA — Datos desde la BD con filtros
+// =============================================================================
+
+/**
+ * Consulta GET /api/lugares/lista con los filtros activos
+ * y repuebla las 3 tablas.
+ */
+async function cargarLista() {
+  try {
+    const q     = document.getElementById('q-lugares').value.trim();
+    const pais  = document.getElementById('filtro-pais').value;
+    const limite = document.getElementById('limit-lugares').value;
+    const params = new URLSearchParams({ limite });
+    if (q)    params.set('q', q);
+    if (pais) params.set('pais', pais);
+
+    const resp = await fetch('/api/lugares/lista?' + params);
+    if (!resp.ok) return;
+
+    const lista = await resp.json();
+
+    // Separar datos para las 3 vistas
+    datosLugares = lista;
+
+    // Construir vistas derivadas desde la lista principal
+    datosGeoref = lista.filter(r => r.latitud != null && r.longitud != null).map(r => ({
+      id: r.id,
+      id_lugar: r.id,
+      nombre_lugar: r.nombre_lugar,
+      latitud: r.latitud,
+      longitud: r.longitud
+    }));
+
+    datosDirecciones = lista.filter(r => r.nombre_calle || r.direccion_completa).map(r => ({
+      id: r.id,
+      id_lugar: r.id,
+      nombre_lugar: r.nombre_lugar,
+      nombre_calle: r.nombre_calle,
+      numero_calle: r.numero_calle,
+      ciudad_estado_provincia: r.ciudad_estado_provincia,
+      pais: r.pais
+    }));
+
+    // Extraer países disponibles de los datos si no existen aún
+    if (paisesDisponibles.length === 0) {
+      const paisesSet = new Set(lista.map(r => r.pais).filter(Boolean));
+      paisesDisponibles = [...paisesSet].sort();
+      llenarSelectoresPaises();
+    }
+
+    // Renderizar las 3 tablas
+    renderizarLugares(datosLugares);
+    renderizarGeoref(datosGeoref);
+    renderizarDirecciones(datosDirecciones);
+
+  } catch {
+    // Silenciar errores en auto-refresh
+  }
+}
+
+// =============================================================================
+// RENDERIZADO DE TABLAS
+// =============================================================================
+
+/**
+ * Renderiza la tabla de Lugares (pestaña 1).
+ */
+function renderizarLugares(filas) {
+  const tbody = document.getElementById('body-lugares');
+  document.getElementById('cnt-lugares').textContent = filas.length;
+  tbody.innerHTML = '';
+
+  if (filas.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Sin lugares encontrados. Procesa un archivo primero.</td></tr>';
+    return;
+  }
+
+  filas.forEach(r => {
+    const lat = r.latitud != null ? r.latitud : '—';
+    const lon = r.longitud != null ? r.longitud : '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--text-muted);font-size:12px;width:60px">${r.id}</td>
+      <td style="font-weight:500;color:var(--accent)">${escHTML(r.nombre_lugar)}</td>
+      <td>${escHTML(r.pais || '—')}</td>
+      <td class="coord">${escHTML(String(lat))}, ${escHTML(String(lon))}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/**
+ * Renderiza la tabla de Georeferencias (pestaña 2).
+ */
+function renderizarGeoref(filas) {
+  const tbody = document.getElementById('body-georef');
+  document.getElementById('cnt-georef').textContent = filas.length;
+  tbody.innerHTML = '';
+
+  if (filas.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Sin georeferencias disponibles.</td></tr>';
+    return;
+  }
+
+  filas.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--text-muted);font-size:12px;width:50px">${r.id}</td>
+      <td style="color:var(--text-muted);font-size:12px">${r.id_lugar}</td>
+      <td style="font-weight:500;color:var(--accent)">${escHTML(r.nombre_lugar)}</td>
+      <td class="coord">${escHTML(String(r.latitud))}</td>
+      <td class="coord">${escHTML(String(r.longitud))}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/**
+ * Renderiza la tabla de Direcciones (pestaña 3).
+ */
+function renderizarDirecciones(filas) {
+  const tbody = document.getElementById('body-direcciones');
+  document.getElementById('cnt-direcciones').textContent = filas.length;
+  tbody.innerHTML = '';
+
+  if (filas.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Sin direcciones disponibles.</td></tr>';
+    return;
+  }
+
+  filas.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--text-muted);font-size:12px;width:50px">${r.id}</td>
+      <td style="color:var(--text-muted);font-size:12px">${r.id_lugar}</td>
+      <td style="font-weight:500;color:var(--accent)">${escHTML(r.nombre_lugar)}</td>
+      <td>${escHTML(r.nombre_calle || '—')}</td>
+      <td>${escHTML(r.numero_calle || '—')}</td>
+      <td>${escHTML(r.ciudad_estado_provincia || '—')}</td>
+      <td><span class="badge b-ok">${escHTML(r.pais || '—')}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// =============================================================================
+// FILTRADO LOCAL — Búsqueda en tiempo real sin ir al servidor
+// =============================================================================
+
+/**
+ * Filtra las 3 tablas localmente según los campos de búsqueda activos.
+ */
+function filtrarLocal() {
+  // Filtrar tabla Lugares
+  const qLugares = document.getElementById('q-lugares').value.toLowerCase().trim();
+  const lugaresF = qLugares
+    ? datosLugares.filter(r => (r.nombre_lugar || '').toLowerCase().includes(qLugares))
+    : datosLugares;
+  renderizarLugares(lugaresF);
+
+  // Filtrar tabla Georeferencias
+  const qGeoref = document.getElementById('q-georef').value.toLowerCase().trim();
+  const georefF = qGeoref
+    ? datosGeoref.filter(r => (r.nombre_lugar || '').toLowerCase().includes(qGeoref))
+    : datosGeoref;
+  renderizarGeoref(georefF);
+
+  // Filtrar tabla Direcciones
+  const qDir = document.getElementById('q-direcciones').value.toLowerCase().trim();
+  const dirF = qDir
+    ? datosDirecciones.filter(r =>
+        (r.nombre_lugar || '').toLowerCase().includes(qDir) ||
+        (r.nombre_calle || '').toLowerCase().includes(qDir) ||
+        (r.ciudad_estado_provincia || '').toLowerCase().includes(qDir) ||
+        (r.pais || '').toLowerCase().includes(qDir)
+      )
+    : datosDirecciones;
+  renderizarDirecciones(dirF);
+}
+
+// =============================================================================
+// SELECTORES DE PAÍS
+// =============================================================================
+
+/**
+ * Llena los selectores de filtro por país en las 3 pestañas.
+ */
+function llenarSelectoresPaises() {
+  const selectores = ['filtro-pais', 'filtro-pais-georef', 'filtro-pais-dir'];
+
+  selectores.forEach(id => {
+    const sel = document.getElementById(id);
+    const valActual = sel.value;
+
+    // Mantener la primera opción "Todos los países"
+    sel.innerHTML = '<option value="">Todos los países</option>';
+
+    paisesDisponibles.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
+      sel.appendChild(opt);
+    });
+
+    // Restaurar selección previa si existía
+    sel.value = valActual;
+  });
+}
+
+// =============================================================================
+// PESTAÑAS — Cambio de pestaña activa
+// =============================================================================
+
+/**
+ * Cambia la pestaña activa (mismo patrón que bd.html).
+ * @param {string} nombre - Nombre del panel (lugares | georef | direcciones)
+ * @param {HTMLElement} el - Elemento de la pestaña clickeada
+ */
+function cambiarTab(nombre, el) {
+  // Desactivar todas las pestañas
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+  // Activar la pestaña seleccionada
+  el.classList.add('active');
+  document.getElementById('panel-' + nombre).classList.add('active');
+}
+
+// =============================================================================
+// DESCARGAS
+// =============================================================================
+
+/**
+ * Abre la URL de descarga en una nueva pestaña.
+ * @param {string} tipo - Tipo de archivo: csv, sql, log
+ */
+function descargar(tipo) {
+  if (!sesionActual) {
+    mostrarError('No hay sesión activa. Procesa un archivo primero.');
+    return;
+  }
+  window.open(`/api/lugares/descargar/${sesionActual}/${tipo}`, '_blank');
+}
+
+// =============================================================================
+// LIMPIAR BASE DE DATOS
+// =============================================================================
+
+/**
+ * Vacía las tablas de Lugares con confirmación del usuario.
+ */
+async function limpiarBD() {
+  if (!confirm('¿Vaciar toda la base de datos de Lugares?\nEsta acción eliminará TODOS los lugares, georeferencias y direcciones.')) return;
+
+  try {
+    const resp = await fetch('/api/lugares/limpiar', { method: 'POST' });
+    const data = await resp.json();
+    alert(data.mensaje || 'Base de datos limpiada correctamente.');
+
+    // Limpiar datos locales
+    datosLugares = [];
+    datosGeoref = [];
+    datosDirecciones = [];
+    paisesDisponibles = [];
+
+    // Re-renderizar todo vacío
+    renderizarLugares([]);
+    renderizarGeoref([]);
+    renderizarDirecciones([]);
+    llenarSelectoresPaises();
+
+    // Actualizar estadísticas
+    actualizarStats({ total_lugares: 0, duplicados_eliminados: 0, paises_unicos: 0, total_georef: 0, total_direcciones: 0 });
+
+  } catch (err) {
+    mostrarError('Error al limpiar la BD: ' + err.message);
+  }
+}
+
+// =============================================================================
+// UTILIDADES
+// =============================================================================
+
+/**
+ * Escapa HTML para prevenir inyección XSS.
+ * @param {*} s - Valor a escapar
+ * @returns {string} Texto escapado
+ */
+function escHTML(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * Muestra un mensaje de error en la caja de errores.
+ * @param {string} msg - Mensaje de error
+ */
+function mostrarError(msg) {
+  const box = document.getElementById('error-box');
+  box.textContent = '❌ ' + msg;
+  box.classList.remove('hidden');
+}
+
+/**
+ * fetch con manejo de errores centralizado.
+ * Retorna el objeto JSON o null si falla.
+ */
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
+// =============================================================================
+// AUTO-REFRESH — Actualización automática cada 15 segundos
+// =============================================================================
+
+/**
+ * Función principal de auto-refresh: actualiza stats y listas.
+ */
+async function autoRefresh() {
+  // Solo refrescar si la sección de resultados es visible
+  if (document.getElementById('results').classList.contains('hidden')) return;
+
+  await Promise.all([cargarStats(), cargarLista()]);
+}
+
+// Ejecutar auto-refresh cada 15 segundos
+setInterval(autoRefresh, 15000);
+autoRefresh();
+
+</script>
+</body>
+</html>

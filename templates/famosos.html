@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Famosos — COMUNAS_NORM</title>
+  <style>
+    /* === RESET Y VARIABLES GLOBALES === */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f4f6fa;
+      --surface: #ffffff;
+      --border: #d8dce8;
+      --border-light: #eaecf3;
+      --text: #1a1d2b;
+      --text-muted: #6b7080;
+      --accent: #2d5be3;
+      --accent-light: #e8edfd;
+      --success: #1a8a5a;
+      --success-light: #e6f7ef;
+      --warn: #b45309;
+      --warn-light: #fef3e2;
+      --danger: #c0392b;
+      --danger-light: #fdecea;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* === LAYOUT PRINCIPAL === */
+    main {
+      max-width: 1100px;
+      margin: 28px auto;
+      padding: 0 20px 60px;
+    }
+
+    /* === TARJETAS === */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-light);
+      font-weight: 600;
+      font-size: 14px;
+      background: #fafbfd;
+    }
+
+    .card-head .num {
+      width: 24px;
+      height: 24px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* === ZONA DE DRAG & DROP === */
+    #dropzone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      background: #fafbfd;
+    }
+
+    #dropzone:hover,
+    #dropzone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    #dropzone .dz-icon {
+      font-size: 38px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    #dropzone p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    #dropzone strong {
+      color: var(--accent);
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    #file-info {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: var(--success-light);
+      border: 1px solid #a3d9c0;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--success);
+    }
+
+    /* === BOTÓN PRINCIPAL === */
+    #btn-run {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    #btn-run:hover {
+      background: #1e44c0;
+    }
+
+    #btn-run:disabled {
+      background: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    /* === ESTADÍSTICAS === */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: #fafbfd;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+
+    .stat .label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .stat .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .stat.ok .value {
+      color: var(--success);
+    }
+
+    .stat.warn .value {
+      color: var(--warn);
+    }
+
+    .stat.info .value {
+      color: var(--accent);
+    }
+
+    .stat.purple .value {
+      color: #7c3aed;
+    }
+
+    .stat.pink .value {
+      color: #f5576c;
+    }
+
+    /* === BOTONES DE DESCARGA === */
+    .dl-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-dl {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid;
+      transition: background .15s;
+    }
+
+    .btn-dl.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-dl.primary:hover {
+      background: #1e44c0;
+    }
+
+    .btn-dl.secondary {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-dl.secondary:hover {
+      background: var(--bg);
+    }
+
+    .btn-dl:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* === BARRA DE FILTROS === */
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .search-wrap input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .search-wrap .ico {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    /* Interruptores tipo toggle */
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .toggle {
+      position: relative;
+      width: 42px;
+      height: 23px;
+    }
+
+    .toggle input {
+      display: none;
+    }
+
+    .toggle .slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 23px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .toggle .slider::after {
+      content: '';
+      position: absolute;
+      width: 17px;
+      height: 17px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+    }
+
+    .toggle input:checked+.slider {
+      background: var(--accent);
+    }
+
+    .toggle input:checked+.slider::after {
+      transform: translateX(19px);
+    }
+
+    /* === TABLA DE DATOS === */
+    .tbl-wrap {
+      overflow-x: auto;
+      max-height: 480px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #f0f3fa;
+      padding: 10px 13px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafbfd;
+    }
+
+    tbody tr:hover {
+      background: var(--accent-light);
+    }
+
+    tbody td {
+      padding: 8px 13px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+
+    .empty-row td {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Resaltar filas con cumpleaños */
+    tbody tr.row-cumple {
+      background: linear-gradient(90deg, rgba(245, 87, 108, 0.06), rgba(240, 147, 251, 0.06));
+    }
+
+    tbody tr.row-cumple:hover {
+      background: linear-gradient(90deg, rgba(245, 87, 108, 0.12), rgba(240, 147, 251, 0.12));
+    }
+
+    /* === BADGES === */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-ok {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .badge-historica {
+      background: #ede9fe;
+      color: #7c3aed;
+    }
+
+    /* Animación de pulso para badge de cumpleaños */
+    @keyframes pulse-birthday {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.15);
+      }
+    }
+
+    .badge-cumple {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: #fff;
+      animation: pulse-birthday 1.5s ease-in-out infinite;
+    }
+
+    .badge-no {
+      background: var(--bg);
+      color: var(--text-muted);
+    }
+
+    /* === LOG (terminal oscuro) === */
+    #log-box {
+      background: #1a1d2b;
+      color: #a8d8a8;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      max-height: 220px;
+      overflow-y: auto;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    /* === SPINNER === */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* === ALERTA DE ERROR === */
+    #error-box {
+      background: var(--danger-light);
+      border: 1px solid #f5c2c2;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    /* === INDICADOR DE AUTO-RECARGA === */
+    .auto-tag {
+      font-size: 12px;
+      color: var(--success);
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- BARRA DE NAVEGACIÓN — activa en "Famosos"                            -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <nav style="background:#1a1d2b;display:flex;align-items:center;padding:0 24px;height:52px;gap:8px">
+    <span style="color:#fff;font-weight:700;font-size:15px;margin-right:16px;letter-spacing:-.3px">🗂️
+      COMUNAS_NORM</span>
+    <a href="/"
+      style="color:rgba(255,255,255,.6);text-decoration:none;padding:6px 14px;border-radius:6px;font-size:14px;font-weight:500">⚙️
+      Normalizar</a>
+    <a href="/base-datos"
+      style="color:rgba(255,255,255,.6);text-decoration:none;padding:6px 14px;border-radius:6px;font-size:14px;font-weight:500">🗄️
+      Base de Datos</a>
+    <a href="/famosos"
+      style="color:#fff;background:#2d5be3;text-decoration:none;padding:6px 14px;border-radius:6px;font-size:14px;font-weight:500">⭐
+      Famosos</a>
+    <a href="/lugares"
+      style="color:rgba(255,255,255,.6);text-decoration:none;padding:6px 14px;border-radius:6px;font-size:14px;font-weight:500">📍
+      Lugares</a>
+  </nav>
+
+  <main>
+
+    <!-- ── PASO 1: Cargar archivo de famosos ──────────────────────────── -->
+    <div class="card">
+      <div class="card-head">
+        <div class="num">1</div> Cargar archivo de famosos (.txt)
+      </div>
+      <div class="card-body">
+        <!-- Zona de arrastrar y soltar -->
+        <div id="dropzone" onclick="document.getElementById('file-input').click()">
+          <span class="dz-icon">⭐</span>
+          <p>Arrastra tu archivo <strong>.txt</strong> aquí o <strong>haz clic para seleccionar</strong></p>
+          <p style="margin-top:6px;font-size:12px;">Un famoso por línea · Formato: Nombre | Fecha de nacimiento</p>
+        </div>
+        <!-- Input oculto para selección de archivo -->
+        <input type="file" id="file-input" accept=".txt">
+        <!-- Mensaje de confirmación de carga -->
+        <div id="file-info"></div>
+        <div id="error-box" class="hidden"></div>
+      </div>
+    </div>
+
+    <!-- ── PASO 2: Procesar datos ─────────────────────────────────────── -->
+    <button id="btn-run" disabled onclick="procesar()">
+      <span id="btn-icon">▶</span>
+      <span id="btn-text">Procesar datos</span>
+    </button>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- RESULTADOS (ocultos hasta que se procese un archivo)              -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <div id="results" class="hidden" style="margin-top:24px;">
+
+      <!-- ── Resumen estadístico ────────────────────────────────────── -->
+      <div class="card">
+        <div class="card-head">
+          📊 Resumen del proceso
+          <span class="auto-tag" style="margin-left:auto">● Auto-recarga 15s</span>
+        </div>
+        <div class="card-body">
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="label">Total procesados</div>
+              <div class="value" id="s-total">0</div>
+            </div>
+            <div class="stat warn">
+              <div class="label">Duplicados eliminados</div>
+              <div class="value" id="s-duplicados">0</div>
+            </div>
+            <div class="stat purple">
+              <div class="label">Fechas históricas</div>
+              <div class="value" id="s-historicas">0</div>
+            </div>
+            <div class="stat pink">
+              <div class="label">Cumpleaños hoy 🎂</div>
+              <div class="value" id="s-cumpleanos">0</div>
+            </div>
+          </div>
+
+          <!-- Botones de descarga y limpiar -->
+          <div class="dl-row">
+            <button class="btn-dl primary" id="btn-csv" onclick="descargar('csv')" disabled>
+              💾 Descargar CSV
+            </button>
+            <button class="btn-dl secondary" id="btn-sql" onclick="descargar('sql')" disabled>
+              🗄️ Descargar SQL
+            </button>
+            <button class="btn-dl secondary" id="btn-log" onclick="descargar('log')" disabled>
+              📋 Descargar LOG
+            </button>
+            <button class="btn-dl secondary" onclick="limpiarBD()"
+              style="color:var(--danger);border-color:var(--danger)">
+              🗑️ Limpiar BD
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tabla de famosos con filtros ────────────────────────────── -->
+      <div class="card">
+        <div class="card-head">
+          🔍 Listado de famosos
+          <span id="count-badge"
+            style="margin-left:auto;font-size:12px;background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:20px;font-weight:600">0
+            registros</span>
+        </div>
+        <div class="card-body">
+
+          <!-- Barra de filtros -->
+          <div class="filter-bar">
+            <div class="search-wrap">
+              <span class="ico">🔎</span>
+              <input type="text" id="filtro-nombre" placeholder="Buscar por nombre…" oninput="cargarLista()">
+            </div>
+            <div class="toggle-wrap">
+              <label class="toggle">
+                <input type="checkbox" id="filtro-cumpleanos" onchange="cargarLista()">
+                <span class="slider"></span>
+              </label>
+              Solo cumpleaños hoy
+            </div>
+            <div class="toggle-wrap">
+              <label class="toggle">
+                <input type="checkbox" id="filtro-historica" onchange="cargarLista()">
+                <span class="slider"></span>
+              </label>
+              Ocultar históricas
+            </div>
+          </div>
+
+          <!-- Tabla de datos -->
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Fecha Original</th>
+                  <th>Fecha Normalizada</th>
+                  <th>Edad</th>
+                  <th>¿Cumpleaños?</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-body">
+                <tr class="empty-row">
+                  <td colspan="6">Procesa un archivo para ver datos aquí</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Log de procesamiento ───────────────────────────────────── -->
+      <div class="card">
+        <div class="card-head">📝 Log de procesamiento</div>
+        <div class="card-body" style="padding:12px">
+          <div id="log-box">Esperando procesamiento…</div>
+        </div>
+      </div>
+
+    </div><!-- /results -->
+
+  </main>
+
+  <script>
+    // =============================================================================
+    // famosos.html — Lógica JavaScript del módulo Famosos
+    // =============================================================================
+    // Responsabilidades:
+    //   1. Gestionar la carga de archivos (drag & drop + clic)
+    //   2. Enviar el archivo al backend Flask via fetch() POST /api/famosos/procesar
+    //   3. Renderizar resultados: estadísticas, tabla con badges, log
+    //   4. Auto-recargar la lista cada 15 segundos
+    //   5. Disparar descargas via /api/famosos/descargar/<sesion_id>/<tipo>
+    // =============================================================================
+
+    // ── Variables globales ─────────────────────────────────────────────
+    // ID de la sesión activa (necesario para las URLs de descarga)
+    let sesionActual = null;
+
+    // Referencia al archivo seleccionado por el usuario
+    let archivoSeleccionado = null;
+
+    // ── Inicialización al cargar la página ─────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      // Si hay datos previos en la BD, cargarlos al abrir
+      cargarStats();
+      cargarLista();
+    });
+
+    // =============================================================================
+    // DRAG & DROP — Zona de carga de archivos
+    // =============================================================================
+
+    const dz = document.getElementById('dropzone');
+
+    // Al arrastrar un archivo sobre la zona: resaltar el borde
+    dz.addEventListener('dragover', e => {
+      e.preventDefault();
+      dz.classList.add('drag-over');
+    });
+
+    // Al salir de la zona: quitar el resaltado
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+
+    // Al soltar el archivo sobre la zona
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.classList.remove('drag-over');
+      const archivos = e.dataTransfer.files;
+      if (archivos.length > 0) registrarArchivo(archivos[0]);
+    });
+
+    // Al seleccionar archivo con el input oculto
+    document.getElementById('file-input').addEventListener('change', e => {
+      if (e.target.files.length > 0) registrarArchivo(e.target.files[0]);
+    });
+
+    // =============================================================================
+    // REGISTRO DE ARCHIVO — Valida y habilita el botón de procesar
+    // =============================================================================
+
+    /**
+     * Registra el archivo seleccionado, muestra info de confirmación y
+     * habilita el botón "Procesar datos".
+     * @param {File} file - Archivo seleccionado por el usuario
+     */
+    function registrarArchivo(file) {
+      // Validar extensión del archivo
+      if (!file.name.toLowerCase().endsWith('.txt')) {
+        mostrarError('Solo se aceptan archivos .txt');
+        return;
+      }
+
+      archivoSeleccionado = file;
+
+      // Calcular tamaño legible
+      const kb = (file.size / 1024).toFixed(1);
+
+      // Mostrar información del archivo cargado
+      const info = document.getElementById('file-info');
+      info.style.display = 'block';
+      info.innerHTML = `✅ <strong>${escHTML(file.name)}</strong> (${kb} KB) — Listo para procesar`;
+
+      // Ocultar errores previos
+      document.getElementById('error-box').classList.add('hidden');
+
+      // Habilitar botón de procesamiento
+      document.getElementById('btn-run').disabled = false;
+    }
+
+    // =============================================================================
+    // PROCESAMIENTO — Envía el archivo al backend
+    // =============================================================================
+
+    /**
+     * Envía el archivo al endpoint POST /api/famosos/procesar,
+     * recibe las estadísticas, preview y log, y renderiza los resultados.
+     */
+    async function procesar() {
+      if (!archivoSeleccionado) return;
+
+      const btn = document.getElementById('btn-run');
+      const btnIcon = document.getElementById('btn-icon');
+      const btnText = document.getElementById('btn-text');
+
+      // Estado de cargando: deshabilitar botón y mostrar spinner
+      btn.disabled = true;
+      btnIcon.innerHTML = '<span class="spinner"></span>';
+      btnText.textContent = 'Procesando…';
+
+      // Ocultar errores previos
+      document.getElementById('error-box').classList.add('hidden');
+
+      try {
+        // Preparar el FormData con el archivo
+        const fd = new FormData();
+        fd.append('archivo', archivoSeleccionado);
+
+        // Enviar al backend
+        const res = await fetch('/api/famosos/procesar', { method: 'POST', body: fd });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Error desconocido del servidor' }));
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // Guardar la sesión para las descargas
+        sesionActual = data.sesion_id;
+
+        // Mostrar la sección de resultados
+        document.getElementById('results').classList.remove('hidden');
+
+        // Actualizar estadísticas con los datos de respuesta
+        document.getElementById('s-total').textContent = data.stats.total || 0;
+        document.getElementById('s-duplicados').textContent = data.stats.duplicados || 0;
+        document.getElementById('s-historicas').textContent = data.stats.historicas || 0;
+        document.getElementById('s-cumpleanos').textContent = data.stats.cumpleanos_hoy || 0;
+
+        // Habilitar botones de descarga
+        document.getElementById('btn-csv').disabled = false;
+        document.getElementById('btn-sql').disabled = false;
+        document.getElementById('btn-log').disabled = false;
+
+        // Renderizar la tabla con el preview recibido
+        renderizarTabla(data.preview || []);
+
+        // Mostrar el log de procesamiento
+        document.getElementById('log-box').textContent = data.log || 'Sin log disponible';
+
+        // Activar auto-recarga de la lista cada 15 segundos
+        iniciarAutoRecarga();
+
+      } catch (err) {
+        mostrarError(err.message);
+      } finally {
+        // Restaurar estado del botón
+        btnIcon.textContent = '▶';
+        btnText.textContent = 'Procesar datos';
+        btn.disabled = false;
+      }
+    }
+
+    // =============================================================================
+    // CARGA DE LISTA — Obtiene los datos filtrados de la BD
+    // =============================================================================
+
+    /**
+     * Llama a GET /api/famosos/lista con los filtros actuales y
+     * renderiza la tabla de resultados.
+     */
+    async function cargarLista() {
+      const params = new URLSearchParams();
+
+      // Filtro por nombre
+      const q = document.getElementById('filtro-nombre').value.trim();
+      if (q) params.set('q', q);
+
+      // Filtro: solo cumpleaños hoy
+      if (document.getElementById('filtro-cumpleanos').checked) {
+        params.set('cumpleanos', '1');
+      }
+
+      // Filtro: ocultar históricas
+      if (document.getElementById('filtro-historica').checked) {
+        params.set('historica', '0');
+      }
+
+      // Límite de registros
+      params.set('limite', '500');
+
+      try {
+        const res = await fetch('/api/famosos/lista?' + params);
+        if (!res.ok) return;
+        const datos = await res.json();
+        renderizarTabla(datos);
+      } catch {
+        // Silenciar errores de conexión en la recarga automática
+      }
+    }
+
+    // =============================================================================
+    // CARGA DE ESTADÍSTICAS — Actualiza las tarjetas de resumen
+    // =============================================================================
+
+    /**
+     * Llama a GET /api/famosos/stats y actualiza los indicadores numéricos.
+     */
+    async function cargarStats() {
+      try {
+        const res = await fetch('/api/famosos/stats');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        document.getElementById('s-total').textContent = data.total || 0;
+        document.getElementById('s-duplicados').textContent = data.duplicados_eliminados || 0;
+        document.getElementById('s-historicas').textContent = data.historicas || 0;
+        document.getElementById('s-cumpleanos').textContent = data.cumpleanos_hoy || 0;
+
+        // Si hay datos, mostrar la sección de resultados
+        if (data.total > 0) {
+          document.getElementById('results').classList.remove('hidden');
+          document.getElementById('btn-csv').disabled = false;
+          document.getElementById('btn-sql').disabled = false;
+          document.getElementById('btn-log').disabled = false;
+        }
+      } catch {
+        // Silenciar errores en la primera carga
+      }
+    }
+
+    // =============================================================================
+    // RENDERIZADO DE TABLA — Dibuja las filas con badges y animaciones
+    // =============================================================================
+
+    /**
+     * Dibuja las filas de la tabla de famosos con badges especiales:
+     * - Badge animado "🎂 ¡Hoy!" para cumpleaños del día
+     * - Badge morado "Histórica" para fechas anteriores a 1900
+     * - Badge neutro "No" para el resto
+     * @param {Array} filas - Array de objetos con datos de famosos
+     */
+    function renderizarTabla(filas) {
+      const tbody = document.getElementById('tabla-body');
+      const badge = document.getElementById('count-badge');
+
+      // Actualizar contador de registros
+      badge.textContent = filas.length + ' registros';
+      tbody.innerHTML = '';
+
+      // Mensaje cuando no hay datos
+      if (filas.length === 0) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Sin datos con los filtros actuales</td></tr>';
+        return;
+      }
+
+      // Generar cada fila con sus badges correspondientes
+      filas.forEach(r => {
+        const tr = document.createElement('tr');
+
+        // Resaltar filas de cumpleaños con clase especial
+        if (r.es_cumpleanos) tr.classList.add('row-cumple');
+
+        // Determinar el badge de cumpleaños
+        let badgeCumple;
+        if (r.es_cumpleanos) {
+          badgeCumple = '<span class="badge badge-cumple">🎂 ¡Hoy!</span>';
+        } else if (r.es_historica) {
+          badgeCumple = '<span class="badge badge-historica">Histórica</span>';
+        } else {
+          badgeCumple = '<span class="badge badge-no">No</span>';
+        }
+
+        tr.innerHTML = `
+          <td style="color:var(--text-muted);font-size:12px;width:50px">${r.id}</td>
+          <td style="font-weight:500">${escHTML(r.nombre)}</td>
+          <td style="font-size:12px;color:var(--text-muted)">${escHTML(r.fecha_original)}</td>
+          <td style="font-weight:500;color:var(--accent)">${escHTML(r.fecha_normalizada)}</td>
+          <td style="text-align:center;font-weight:600">${r.edad != null ? r.edad : '—'}</td>
+          <td>${badgeCumple}</td>`;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // =============================================================================
+    // DESCARGAS — Abre la URL de descarga en nueva pestaña
+    // =============================================================================
+
+    /**
+     * Abre la URL de descarga del tipo solicitado (csv, sql, log).
+     * Usa la sesión activa o 'ultima' como fallback.
+     * @param {string} tipo - Tipo de archivo: 'csv', 'sql' o 'log'
+     */
+    function descargar(tipo) {
+      const sesion = sesionActual || 'ultima';
+      window.open(`/api/famosos/descargar/${sesion}/${tipo}`, '_blank');
+    }
+
+    // =============================================================================
+    // LIMPIAR BD — Elimina todos los datos de famosos
+    // =============================================================================
+
+    /**
+     * Llama a POST /api/famosos/limpiar previa confirmación del usuario.
+     * Vacía la tabla de famosos y recarga la vista.
+     */
+    async function limpiarBD() {
+      if (!confirm('¿Vaciar toda la base de datos de famosos?\nEsta acción eliminará TODOS los registros.')) return;
+
+      try {
+        const res = await fetch('/api/famosos/limpiar', { method: 'POST' });
+        const data = await res.json();
+        alert(data.mensaje || 'Base de datos limpiada correctamente');
+
+        // Recargar estadísticas y lista
+        cargarStats();
+        cargarLista();
+      } catch (err) {
+        alert('Error al limpiar: ' + err.message);
+      }
+    }
+
+    // =============================================================================
+    // AUTO-RECARGA — Refresca la tabla cada 15 segundos
+    // =============================================================================
+
+    // Referencia al intervalo de auto-recarga (para evitar duplicados)
+    let intervaloRecarga = null;
+
+    /**
+     * Inicia la recarga automática de la lista y estadísticas cada 15 segundos.
+     * Si ya hay un intervalo activo, lo reemplaza.
+     */
+    function iniciarAutoRecarga() {
+      if (intervaloRecarga) clearInterval(intervaloRecarga);
+
+      intervaloRecarga = setInterval(() => {
+        cargarLista();
+        cargarStats();
+      }, 15000);
+    }
+
+    // =============================================================================
+    // UTILIDADES
+    // =============================================================================
+
+    /**
+     * Escapa caracteres HTML peligrosos para prevenir inyección XSS.
+     * @param {string} s - Cadena a escapar
+     * @returns {string} Cadena segura para insertar en el DOM
+     */
+    function escHTML(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * Muestra un mensaje de error en el cuadro de alerta rojo.
+     * @param {string} msg - Mensaje de error a mostrar
+     */
+    function mostrarError(msg) {
+      const box = document.getElementById('error-box');
+      box.classList.remove('hidden');
+      box.textContent = '❌ ' + msg;
+    }
+  </script>
+</body>
+
+</html>
