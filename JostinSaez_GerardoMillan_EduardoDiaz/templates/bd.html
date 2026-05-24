@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visor BD — COMUNAS_NORM</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f4f6fa; --surface: #fff; --border: #d8dce8; --border-light: #eaecf3;
+  --text: #1a1d2b; --muted: #6b7080;
+  --accent: #2d5be3; --accent-light: #e8edfd;
+  --success: #1a8a5a; --success-light: #e6f7ef;
+  --warn: #b45309; --warn-light: #fef3e2;
+  --danger: #c0392b; --danger-light: #fdecea;
+  --radius: 10px; --radius-sm: 6px; --shadow: 0 1px 4px rgba(0,0,0,.07);
+}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+/* NAV */
+nav { background: #1a1d2b; display: flex; align-items: center; padding: 0 24px; height: 52px; gap: 8px; }
+nav a { color: rgba(255,255,255,.6); text-decoration: none; padding: 6px 14px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; transition: all .15s; }
+nav a:hover { color: #fff; background: rgba(255,255,255,.1); }
+nav a.active { color: #fff; background: var(--accent); }
+nav .brand { color: #fff; font-weight: 700; font-size: 15px; margin-right: 16px; letter-spacing: -.3px; }
+
+/* LAYOUT */
+main { max-width: 1100px; margin: 28px auto; padding: 0 20px 60px; }
+
+/* CARDS */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; }
+.card-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border-light); font-weight: 600; font-size: 14px; background: #fafbfd; gap: 10px; }
+.card-head h2 { font-size: 14px; font-weight: 600; }
+.card-body { padding: 20px; }
+
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat { background: #fafbfd; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 16px 18px; }
+.stat .lbl { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.stat .val { font-size: 24px; font-weight: 700; }
+.stat .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.stat.blue .val  { color: var(--accent); }
+.stat.green .val { color: var(--success); }
+.stat.warn .val  { color: var(--warn); }
+.stat.red .val   { color: var(--danger); }
+
+/* PESTANAS */
+.tabs { display: flex; border-bottom: 2px solid var(--border-light); margin-bottom: 20px; }
+.tab { padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--muted); transition: all .15s; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* BARRA DE HERRAMIENTAS */
+.toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-wrap input { width: 100%; padding: 8px 12px 8px 36px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; background: #fff; color: var(--text); }
+.search-wrap input:focus { outline: none; border-color: var(--accent); }
+.search-wrap .ico { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 14px; pointer-events: none; }
+select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; background: #fff; color: var(--text); cursor: pointer; }
+select:focus { outline: none; border-color: var(--accent); }
+
+/* TABLA */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); max-height: 480px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { position: sticky; top: 0; background: #f0f3fa; padding: 10px 13px; text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; }
+thead th:hover { background: #e8edf5; color: var(--text); }
+thead th .arrow { opacity: .4; margin-left: 4px; font-size: 10px; }
+thead th.sorted .arrow { opacity: 1; }
+tbody tr:hover { background: var(--accent-light); }
+tbody tr:nth-child(even) { background: #fafbfd; }
+tbody tr:nth-child(even):hover { background: var(--accent-light); }
+tbody td { padding: 8px 13px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.empty-row td { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+
+/* BADGES */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.b-ok   { background: var(--success-light); color: var(--success); }
+.b-mod  { background: var(--accent-light);  color: var(--accent);  }
+.b-dup  { background: var(--danger-light);  color: var(--danger);  }
+
+/* CHIPS DE SESION */
+.chip { display: inline-block; padding: 2px 8px; background: #f0f3fa; border: 1px solid var(--border-light); border-radius: 20px; font-size: 11px; font-family: monospace; color: var(--muted); }
+
+/* BOTONES */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: 1px solid; transition: background .15s; }
+.btn-primary  { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: #1e44c0; }
+.btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-ghost:hover { background: var(--bg); }
+.btn-danger { background: var(--surface); color: var(--danger); border-color: var(--danger); }
+.btn-danger:hover { background: var(--danger-light); }
+
+/* ESQUEMA SQL */
+.sql-box { background: #1a1d2b; border-radius: var(--radius-sm); padding: 16px 18px; font-family: 'Courier New', monospace; font-size: 12.5px; line-height: 1.9; color: #cdd9f5; white-space: pre; overflow-x: auto; }
+.sql-kw  { color: #7ec8e3; font-weight: bold; }
+.sql-type{ color: #f9c74f; }
+.sql-cmt { color: #6b7080; }
+.sql-pk  { color: #f08080; }
+
+/* INFO */
+.db-path { font-size: 12px; color: var(--muted); font-family: monospace; background: #f0f3fa; padding: 6px 10px; border-radius: var(--radius-sm); margin-top: 8px; word-break: break-all; }
+
+/* RECARGA */
+.refresh-row { display: flex; align-items: center; gap: 10px; }
+.auto-tag { font-size: 12px; color: var(--success); font-weight: 500; }
+
+/* CONTADOR */
+.count-badge { font-size: 12px; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- NAVEGACION -->
+<nav>
+  <span class="brand">🗂️ COMUNAS_NORM</span>
+  <a href="/">⚙️ Normalizar</a>
+  <a href="/base-datos" class="active">🗄️ Base de Datos</a>
+  <a href="/famosos">⭐ Famosos</a>
+  <a href="/lugares">📍 Lugares</a>
+</nav>
+
+<main>
+
+  <!-- ENCABEZADO Y STATS -->
+  <div class="card">
+    <div class="card-head">
+      <h2>📊 Estado de la Base de Datos SQLite</h2>
+      <div class="refresh-row">
+        <span class="auto-tag" id="auto-label">● En vivo</span>
+        <button class="btn btn-ghost" onclick="cargarTodo()" style="font-size:12px">🔄 Actualizar</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="stats-grid">
+        <div class="stat blue">
+          <div class="lbl">Comunas en BD</div>
+          <div class="val" id="st-comunas">—</div>
+          <div class="sub">tabla COMUNAS_NORM</div>
+        </div>
+        <div class="stat green">
+          <div class="lbl">Entradas en LOG</div>
+          <div class="val" id="st-log">—</div>
+          <div class="sub">tabla PROCESO_LOG</div>
+        </div>
+        <div class="stat warn">
+          <div class="lbl">Sesiones realizadas</div>
+          <div class="val" id="st-sesiones">—</div>
+          <div class="sub">archivos procesados</div>
+        </div>
+        <div class="stat red">
+          <div class="lbl">Duplicados detectados</div>
+          <div class="val" id="st-dups">—</div>
+          <div class="sub">registros omitidos</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Modificaciones hechas</div>
+          <div class="val" id="st-mods" style="color:var(--accent)">—</div>
+          <div class="sub">valores transformados</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Último proceso</div>
+          <div class="val" id="st-ultima" style="font-size:13px;padding-top:4px">—</div>
+        </div>
+      </div>
+      <div class="db-path" id="db-path">Cargando ruta de la base de datos…</div>
+    </div>
+  </div>
+
+  <!-- PESTANAS: COMUNAS / LOG / ESQUEMA -->
+  <div class="card">
+    <div class="card-head">
+      <h2>🔍 Explorador de Tablas</h2>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" id="btn-dl-csv" onclick="descargar('csv')" style="font-size:12px">💾 Exportar CSV</button>
+        <button class="btn btn-ghost"   id="btn-dl-sql" onclick="descargar('sql')" style="font-size:12px">🗄️ Exportar SQL</button>
+        <button class="btn btn-danger"  onclick="limpiarBD()"                      style="font-size:12px">🗑️ Limpiar BD</button>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="tabs">
+        <div class="tab active" onclick="cambiarTab('comunas', this)">
+          🏘️ COMUNAS_NORM <span class="count-badge" id="cnt-comunas">0</span>
+        </div>
+        <div class="tab" onclick="cambiarTab('log', this)">
+          📋 PROCESO_LOG <span class="count-badge" id="cnt-log">0</span>
+        </div>
+        <div class="tab" onclick="cambiarTab('esquema', this)">
+          📐 Esquema SQL
+        </div>
+      </div>
+
+      <!-- TAB: COMUNAS_NORM -->
+      <div class="tab-panel active" id="panel-comunas">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="ico">🔎</span>
+            <input type="text" id="q-comunas" placeholder="Buscar comuna…" oninput="filtrarComunas()">
+          </div>
+          <select id="limit-comunas" onchange="cargarComunas()">
+            <option value="100">100 registros</option>
+            <option value="250">250 registros</option>
+            <option value="500" selected>500 registros</option>
+            <option value="9999">Todos</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table id="tbl-comunas">
+            <thead>
+              <tr>
+                <th onclick="ordenar('comunas','id',this)">ID <span class="arrow">↕</span></th>
+                <th onclick="ordenar('comunas','nombre',this)">nombre_comuna <span class="arrow">↕</span></th>
+                <th onclick="ordenar('comunas','fecha',this)">fecha_insercion <span class="arrow">↕</span></th>
+              </tr>
+            </thead>
+            <tbody id="body-comunas">
+              <tr class="empty-row"><td colspan="3">Cargando datos…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: PROCESO_LOG -->
+      <div class="tab-panel" id="panel-log">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="ico">🔎</span>
+            <input type="text" id="q-log" placeholder="Buscar valor original o normalizado…" oninput="filtrarLog()">
+          </div>
+          <select id="filtro-estado" onchange="cargarLog()">
+            <option value="">Todos los estados</option>
+            <option value="OK">✅ OK</option>
+            <option value="MODIFICADO">🔵 Modificado</option>
+            <option value="DUPLICADO">🔴 Duplicado</option>
+          </select>
+          <select id="filtro-sesion" onchange="cargarLog()">
+            <option value="">Todas las sesiones</option>
+          </select>
+          <select id="limit-log" onchange="cargarLog()">
+            <option value="100">100 registros</option>
+            <option value="250">250 registros</option>
+            <option value="500" selected>500 registros</option>
+            <option value="9999">Todos</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table id="tbl-log">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Línea</th>
+                <th>Valor Original</th>
+                <th>Valor Normalizado</th>
+                <th>Estado</th>
+                <th>Sesión</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="body-log">
+              <tr class="empty-row"><td colspan="7">Cargando datos…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: ESQUEMA SQL -->
+      <div class="tab-panel" id="panel-esquema">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">
+          Estructura de las tablas creadas en <strong>comunas_norm.db</strong> (SQLite):
+        </p>
+        <div class="sql-box"><span class="sql-cmt">-- ================================================</span>
+<span class="sql-cmt">-- Tabla 1: comunas normalizadas y únicas</span>
+<span class="sql-cmt">-- ================================================</span>
+<span class="sql-kw">CREATE TABLE IF NOT EXISTS</span> COMUNAS_NORM (
+    id              <span class="sql-type">INTEGER</span>  <span class="sql-pk">PRIMARY KEY AUTOINCREMENT</span>,
+    nombre_comuna   <span class="sql-type">TEXT</span>     <span class="sql-pk">NOT NULL UNIQUE</span>,  <span class="sql-cmt">-- UNIQUE evita duplicados</span>
+    fecha_insercion <span class="sql-type">TEXT</span>     NOT NULL
+);
+
+<span class="sql-cmt">-- ================================================</span>
+<span class="sql-cmt">-- Tabla 2: historial de cada transformación ETL</span>
+<span class="sql-cmt">-- ================================================</span>
+<span class="sql-kw">CREATE TABLE IF NOT EXISTS</span> PROCESO_LOG (
+    id          <span class="sql-type">INTEGER</span>  <span class="sql-pk">PRIMARY KEY AUTOINCREMENT</span>,
+    sesion_id   <span class="sql-type">TEXT</span>     NOT NULL,  <span class="sql-cmt">-- timestamp del procesamiento</span>
+    linea_num   <span class="sql-type">INTEGER</span>,            <span class="sql-cmt">-- n° de línea en el archivo original</span>
+    valor_orig  <span class="sql-type">TEXT</span>,              <span class="sql-cmt">-- valor antes de normalizar</span>
+    valor_norm  <span class="sql-type">TEXT</span>,              <span class="sql-cmt">-- valor después de normalizar</span>
+    estado      <span class="sql-type">TEXT</span>,              <span class="sql-cmt">-- OK | MODIFICADO | DUPLICADO</span>
+    fecha       <span class="sql-type">TEXT</span>     NOT NULL
+);</div>
+
+        <p style="font-size:13px;color:var(--muted);margin-top:16px;margin-bottom:10px">Consultas de ejemplo:</p>
+        <div class="sql-box"><span class="sql-cmt">-- Ver todas las comunas ordenadas alfabéticamente</span>
+<span class="sql-kw">SELECT</span> * <span class="sql-kw">FROM</span> COMUNAS_NORM <span class="sql-kw">ORDER BY</span> nombre_comuna;
+
+<span class="sql-cmt">-- Contar registros por estado</span>
+<span class="sql-kw">SELECT</span> estado, <span class="sql-kw">COUNT</span>(*) <span class="sql-kw">FROM</span> PROCESO_LOG <span class="sql-kw">GROUP BY</span> estado;
+
+<span class="sql-cmt">-- Ver solo los valores que fueron modificados</span>
+<span class="sql-kw">SELECT</span> valor_orig, valor_norm <span class="sql-kw">FROM</span> PROCESO_LOG
+<span class="sql-kw">WHERE</span> estado = <span class="sql-type">'MODIFICADO'</span>;</div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<script>
+// =============================================================================
+// bd.html — Visor interactivo de la base de datos SQLite
+// Consulta los endpoints /api/stats, /api/comunas, /api/logs y /api/sesiones
+// y renderiza los datos en tablas con búsqueda, filtros y ordenamiento.
+// =============================================================================
+
+// Estado local de los datos cargados (para ordenar sin volver a pedir al servidor)
+let datosComunas = [];
+let datosLog     = [];
+
+// Columna y dirección de ordenamiento activos
+let sortState = { tabla: null, col: null, asc: true };
+
+// Sesion actual (para descargar el log de la última sesión)
+let ultimaSesion = null;
+
+// ===========================================================================
+// INICIALIZACIÓN
+// ===========================================================================
+
+// Cargar todos los datos al abrir la página
+cargarTodo();
+
+// Refrescar automáticamente cada 15 segundos
+setInterval(cargarTodo, 15000);
+
+/**
+ * Carga estadísticas, comunas, log y sesiones en paralelo.
+ */
+async function cargarTodo() {
+  await Promise.all([cargarStats(), cargarComunas(), cargarLog(), cargarSesiones()]);
+}
+
+// ===========================================================================
+// ESTADÍSTICAS
+// ===========================================================================
+
+async function cargarStats() {
+  const data = await fetchJSON('/api/stats');
+  if (!data) return;
+
+  document.getElementById('st-comunas').textContent  = data.total_comunas.toLocaleString();
+  document.getElementById('st-log').textContent      = data.total_log.toLocaleString();
+  document.getElementById('st-sesiones').textContent = data.total_sesiones.toLocaleString();
+  document.getElementById('st-dups').textContent     = data.duplicados.toLocaleString();
+  document.getElementById('st-mods').textContent     = data.modificados.toLocaleString();
+  document.getElementById('st-ultima').textContent   = data.ultima_sesion;
+  document.getElementById('db-path').textContent     = '📁 ' + data.archivo_db;
+
+  // Guardar la sesión más reciente para la descarga de log
+  ultimaSesion = data.ultima_sesion !== 'Sin datos' ? null : null;
+}
+
+// ===========================================================================
+// TABLA: COMUNAS_NORM
+// ===========================================================================
+
+/**
+ * Carga las comunas desde /api/comunas y renderiza la tabla.
+ * Respeta el filtro de búsqueda y el límite seleccionado.
+ */
+async function cargarComunas() {
+  const q      = document.getElementById('q-comunas').value.trim();
+  const limite = document.getElementById('limit-comunas').value;
+  const params = new URLSearchParams({ limite });
+  if (q) params.set('q', q);
+
+  datosComunas = await fetchJSON('/api/comunas?' + params) || [];
+  renderizarComunas(datosComunas);
+}
+
+/**
+ * Filtrado en tiempo real: filtra localmente sin ir al servidor.
+ */
+function filtrarComunas() {
+  const q = document.getElementById('q-comunas').value.toLowerCase().trim();
+  const filtradas = q
+    ? datosComunas.filter(r => r.nombre_comuna.toLowerCase().includes(q))
+    : datosComunas;
+  renderizarComunas(filtradas);
+}
+
+/**
+ * Dibuja las filas de la tabla COMUNAS_NORM.
+ */
+function renderizarComunas(filas) {
+  const tbody = document.getElementById('body-comunas');
+  document.getElementById('cnt-comunas').textContent = filas.length;
+  tbody.innerHTML = '';
+
+  if (filas.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="3">Sin datos en COMUNAS_NORM. Procesa un archivo primero.</td></tr>';
+    return;
+  }
+
+  filas.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--muted);font-size:12px;width:60px">${r.id}</td>
+      <td style="font-weight:500;color:var(--accent)">${esc(r.nombre_comuna)}</td>
+      <td style="font-size:12px;color:var(--muted)">${r.fecha_insercion}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ===========================================================================
+// TABLA: PROCESO_LOG
+// ===========================================================================
+
+/**
+ * Carga el log desde /api/logs con los filtros activos.
+ */
+async function cargarLog() {
+  const q      = document.getElementById('q-log').value.trim();
+  const estado = document.getElementById('filtro-estado').value;
+  const sesion = document.getElementById('filtro-sesion').value;
+  const limite = document.getElementById('limit-log').value;
+  const params = new URLSearchParams({ limite });
+  if (q)      params.set('q', q);
+  if (estado) params.set('estado', estado);
+  if (sesion) params.set('sesion', sesion);
+
+  datosLog = await fetchJSON('/api/logs?' + params) || [];
+  renderizarLog(datosLog);
+}
+
+/** Filtrado local en tiempo real del log. */
+function filtrarLog() {
+  const q = document.getElementById('q-log').value.toLowerCase().trim();
+  const filtrados = q
+    ? datosLog.filter(r =>
+        r.valor_orig.toLowerCase().includes(q) ||
+        r.valor_norm.toLowerCase().includes(q)
+      )
+    : datosLog;
+  renderizarLog(filtrados);
+}
+
+/**
+ * Dibuja las filas de la tabla PROCESO_LOG con badges de estado.
+ */
+function renderizarLog(filas) {
+  const tbody = document.getElementById('body-log');
+  document.getElementById('cnt-log').textContent = filas.length;
+  tbody.innerHTML = '';
+
+  if (filas.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Sin entradas en PROCESO_LOG con los filtros actuales.</td></tr>';
+    return;
+  }
+
+  filas.forEach(r => {
+    // Definir badge visual según el estado
+    const badgeClass = r.estado === 'DUPLICADO' ? 'b-dup' : r.estado === 'MODIFICADO' ? 'b-mod' : 'b-ok';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--muted);font-size:11px">${r.id}</td>
+      <td style="color:var(--muted);font-size:12px">${r.linea_num}</td>
+      <td>${esc(r.valor_orig)}</td>
+      <td style="font-weight:500;color:var(--accent)">${esc(r.valor_norm)}</td>
+      <td><span class="badge ${badgeClass}">${r.estado}</span></td>
+      <td><span class="chip">${r.sesion_id}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${r.fecha}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ===========================================================================
+// SESIONES
+// ===========================================================================
+
+/**
+ * Carga las sesiones disponibles y llena el selector de filtro.
+ */
+async function cargarSesiones() {
+  const sesiones = await fetchJSON('/api/sesiones') || [];
+  const sel = document.getElementById('filtro-sesion');
+  const valActual = sel.value;
+
+  // Regenerar opciones conservando la selección actual
+  sel.innerHTML = '<option value="">Todas las sesiones</option>';
+  sesiones.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.sesion_id;
+    opt.textContent = `${s.sesion_id} (${s.total} registros)`;
+    sel.appendChild(opt);
+  });
+  sel.value = valActual;
+
+  // Guardar la sesión más reciente para descarga de log
+  if (sesiones.length > 0) ultimaSesion = sesiones[0].sesion_id;
+}
+
+// ===========================================================================
+// PESTAÑAS
+// ===========================================================================
+
+function cambiarTab(nombre, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + nombre).classList.add('active');
+}
+
+// ===========================================================================
+// ORDENAMIENTO DE TABLAS
+// ===========================================================================
+
+/**
+ * Ordena los datos locales por la columna indicada y re-renderiza.
+ * Alterna ascendente/descendente al hacer clic en la misma columna.
+ */
+function ordenar(tabla, col, th) {
+  // Determinar dirección
+  const misma = sortState.tabla === tabla && sortState.col === col;
+  sortState = { tabla, col, asc: misma ? !sortState.asc : true };
+
+  // Actualizar indicadores visuales de la cabecera
+  th.closest('thead').querySelectorAll('th').forEach(h => {
+    h.classList.remove('sorted');
+    h.querySelector('.arrow').textContent = '↕';
+  });
+  th.classList.add('sorted');
+  th.querySelector('.arrow').textContent = sortState.asc ? '↑' : '↓';
+
+  // Función de comparación según la columna
+  const cmp = (a, b) => {
+    let va, vb;
+    if (tabla === 'comunas') {
+      if (col === 'id')     { va = a.id;              vb = b.id; }
+      if (col === 'nombre') { va = a.nombre_comuna;   vb = b.nombre_comuna; }
+      if (col === 'fecha')  { va = a.fecha_insercion; vb = b.fecha_insercion; }
+    }
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    return va < vb ? -1 : va > vb ? 1 : 0;
+  };
+
+  const datos = tabla === 'comunas' ? [...datosComunas] : [...datosLog];
+  datos.sort((a, b) => sortState.asc ? cmp(a, b) : -cmp(a, b));
+
+  if (tabla === 'comunas') { datosComunas = datos; renderizarComunas(datos); }
+}
+
+// ===========================================================================
+// DESCARGAS
+// ===========================================================================
+
+function descargar(tipo) {
+  const sesion = ultimaSesion || 'ultima';
+  window.open(`/api/descargar/${sesion}/${tipo}`, '_blank');
+}
+
+// ===========================================================================
+// LIMPIAR BASE DE DATOS
+// ===========================================================================
+
+async function limpiarBD() {
+  if (!confirm('¿Vaciar toda la base de datos?\nEsta acción eliminará TODAS las comunas y el log completo.')) return;
+  const res  = await fetch('/api/limpiar', { method: 'POST' });
+  const data = await res.json();
+  alert(data.mensaje);
+  cargarTodo();  // refrescar la vista
+}
+
+// ===========================================================================
+// UTILIDADES
+// ===========================================================================
+
+/** Escape HTML para evitar inyeccion. */
+function esc(s) {
+  return String(s || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/**
+ * fetch con manejo de errores centralizado.
+ * Retorna el objeto JSON o null si falla.
+ */
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+</script>
+</body>
+</html>

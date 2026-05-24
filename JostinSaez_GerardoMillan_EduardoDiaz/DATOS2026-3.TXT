@@ -1,0 +1,90 @@
+Nombre del lugar;DirecciÛn Completa;Georeferencia
+Googleplex;1600 Amphitheatre Parkway, Mountain View, CA 94043, USA;37.422, -122.084
+Apple Park;1 Apple Park Way, Cupertino, CA 95014, USA;37.3328, -122.0059
+The White House;1600 Pennsylvania Ave NW, Washington, DC 20500, USA;38.8977, -77.0365
+10 Downing Street;10 Downing St, Westminster, London SW1A 2AA, UK;51.5034, -0.1276
+Eiffel Tower;Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France;48.8584, 2.2945
+Apple Park;1 Infinite Loop, Cupertino, CA 95014, USA;37.3317, -122.0307
+Buckingham Palace;Westminster, London SW1A 1AA, UK;51.5014, -0.1419
+Statue of Liberty;Liberty Island, New York, NY 10004, USA;40.6892, -74.0445
+Vatican City;Vatican;41.9029, 12.4534
+Shibuya Crossing;2 Chome-2-1 Dogenzaka, Shibuya City, Tokyo 150-0043, Japan;35.6591, 139.7005
+221B Baker Street;221B Baker St, Marylebone, London NW1 6XE, UK;51.5238, -0.1588
+Great Wall of China;Beijing, China;40.4319, 116.5704
+Sydney Opera House;Sydney NSW 2000, Australia;-33.8568, 151.2153
+CN Tower;301 Front St W, Toronto, ON M5V 2T6, Canada;43.6426, -79.3871
+Burj Khalifa;1 Sheikh Mohammed bin Rashid Blvd, Dubai, UAE;25.1972, 55.2744
+Christ the Redeemer;Rio de Janeiro - RJ, Brazil;-22.9519, -43.2106
+Colosseum;Piazza del Colosseo, 1, 00184 Roma RM, Italy;41.8902, 12.4922
+Taj Mahal;Dharmapuri, Forest Colony, Tajganj, Agra, Uttar Pradesh 282001, India;27.1751, 78.0421
+Grand Canyon National Park;Arizona, USA;36.107, -112.113
+Leaning Tower of Pisa;Piazza del Duomo, 56126 Pisa PI, Italy;43.7229, 10.3966
+Acropolis of Athens;Athens 105 58, Greece;37.9715, 23.7266
+Machu Picchu;Aguas Calientes 08680, Peru;-13.1631, -72.5450
+Hollywood Walk of Fame;Hollywood, Los Angeles, CA 90028, USA;34.1016, -118.3414
+Niagara Falls;Niagara Falls, NY, USA;43.0812, -79.0663
+Mount Everest;Everest Base Camp, Nepal;27.9881, 86.9250
+Petra;Wadi Musa, Jordan;30.3285, 35.4444
+Machu Picchu;Machu Picchu 08680, Peru;-13.1631, -72.5450
+Golden Gate Bridge;Golden Gate Bridge, San Francisco, CA, USA;37.8199, -122.4783
+Times Square;Manhattan, NY 10036, USA;40.7580, -73.9855
+Amazon Rainforest;Amazon Rainforest, South America;-3.4653, -62.2159
+Mount Rushmore;Keystone, SD 57751, USA;43.8791, -103.4591
+Red Square;Moscow, Russia;55.7539, 37.6208
+Edinburgh Castle;Castlehill, Edinburgh EH1 2NG, UK;55.9486, -3.1999
+Sydney Harbour Bridge;Sydney NSW, Australia;-33.8523, 151.2108
+Big Ben;Westminster, London SW1A 0AA, UK;51.5007, -0.1246
+Pyramids of Giza;Al Haram, Nazlet El-Semman, Al Haram, Giza Governorate, Egypt;29.9792, 31.1342
+Yellowstone National Park;Yellowstone National Park, WY 82190, USA;44.4279, -110.5885
+Hollywood Sign;Los Angeles, CA 90068, USA;34.1341, -118.3215
+Louvre Museum;Rue de Rivoli, 75001 Paris, France;48.8606, 2.3376
+Mount Fuji;Kitayama, Fujinomiya, Shizuoka 418-0112, Japan;35.3606, 138.7274
+Kremlin;Moscow, Russia;55.7517, 37.6178
+Buckingham Palace Gardens;Buckingham Palace Road, London SW1A 1AA, UK;51.5014, -0.1419
+Vatican Museums;Viale Vaticano, 00165 Roma RM, Italy;41.9062, 12.4544
+Golden Gate Park;San Francisco, CA, USA;37.7694, -122.4862
+Brandenburg Gate;Pariser Platz, 10117 Berlin, Germany;52.5163, 13.3777
+Mount Kilimanjaro;Kilimanjaro, Tanzania;-3.0674, 37.3556
+The Louvre Pyramid;Rue de Rivoli, 75001 Paris, France;48.8606, 2.3376
+Lake Titicaca;Lake Titicaca;-15.9254, -69.3356
+Stonehenge;Salisbury SP4 7DE, UK;51.1789, -1.8262
+Chichen Itza;Yucatan, Mexico;20.6843, -88.5678
+Machu Picchu;Cusco 08002, Peru;-13.1631, -72.5450
+Easter Island;Easter Island, Valparaiso Region, Chile;-27.1212, -109.3665
+The Great Barrier Reef;Great Barrier Reef, Queensland, Australia;-18.2871, 147.6992
+Yosemite National Park;Yosemite National Park, CA, USA;37.8651, -119.5383
+Grand Canyon;Grand Canyon National Park, Arizona, USA;36.1069, -112.1129
+Mount Vesuvius;80044 Ottaviano, Metropolitan City of Naples, Italy;40.8219, 14.4283
+Alcatraz Island;San Francisco, CA, USA;37.8267, -122.4233
+Neuschwanstein Castle;Neuschwansteinstraﬂe 20, 87645 Schwangau, Germany;47.5576, 10.7498
+Angkor Wat;Angkor Archaeological Park, Krong Siem Reap, Cambodia;13.4125, 103.8660
+Statue of Liberty;Liberty Island, New York, NY 10004, USA;40.6892, -74.0445
+Mount Rushmore;Keystone, SD 57751, USA;43.8791, -103.4591
+Yellowstone National Park;Yellowstone National Park, WY 82190, USA;44.4279, -110.5885
+Stonehenge;Salisbury SP4 7DE, UK;51.1789, -1.8262
+The Great Wall of China;Beijing, China;40.4319, 116.5704
+Buckingham Palace;Westminster, London SW1A 1AA, UK;51.5014, -0.1419
+Machu Picchu;Machu Picchu 08680, Peru;-13.1631, -72.5450
+Sydney Opera House;Sydney NSW 2000, Australia;-33.8568, 151.2153
+Mount Everest;Everest Base Camp, Nepal;27.9881, 86.9250
+Christ the Redeemer;Rio de Janeiro - RJ, Brazil;-22.9519, -43.2106
+Taj Mahal;Dharmapuri, Forest Colony, Tajganj, Agra, Uttar Pradesh 282001, India;27.1751, 78.0421
+Eiffel Tower;Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France;48.8584, 2.2945
+Burj Khalifa;1 Sheikh Mohammed bin Rashid Blvd, Dubai, UAE;25.1972, 55.2744
+Colosseum;Piazza del Colosseo, 1, 00184 Roma RM, Italy;41.8902, 12.4922
+Grand Canyon;Grand Canyon National Park, Arizona, USA;36.107, -112.113
+Niagara Falls;Niagara Falls, NY, USA;43.0812, -79.0663
+Great Barrier Reef;Great Barrier Reef, Queensland, Australia;-18.2871, 147.6992
+Angkor Wat;Angkor Archaeological Park, Krong Siem Reap, Cambodia;13.4125, 103.8660
+Machu Picchu;Cusco 08002, Peru;-13.1631, -72.5450
+Hollywood Sign;Los Angeles, CA 90068, USA;34.1341, -118.3215
+Vatican City;Vatican;41.9029, 12.4534
+Big Ben;Westminster, London SW1A 0AA, UK;51.5007, -0.1246
+Louvre Museum;Rue de Rivoli, 75001 Paris, France;48.8606, 2.3376
+Kremlin;Moscow, Russia;55.7517, 37.6178
+Amazon Rainforest;Amazon Rainforest, South America;-3.4653, -62.2159
+Leaning Tower of Pisa;Piazza del Duomo, 56126 Pisa PI, Italy;43.7229, 10.3966
+Mount Fuji;Kitayama, Fujinomiya, Shizuoka 418-0112, Japan;35.3606, 138.7274
+Chichen Itza;Yucatan, Mexico;20.6843, -88.5678
+Alcatraz Island;San Francisco, CA, USA;37.8267, -122.4233
+Neuschwanstein Castle;Neuschwansteinstraﬂe 20, 87645 Schwangau, Germany;47.5576, 10.7498
